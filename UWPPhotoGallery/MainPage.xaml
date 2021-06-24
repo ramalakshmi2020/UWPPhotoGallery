@@ -1,0 +1,71 @@
+﻿<Page
+    x:Class="UWPPhotoGallery.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UWPPhotoGallery"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0">
+          <!--  <Border.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="Gray"/>
+                </LinearGradientBrush>
+            </Border.Background> !-->
+        </Border>
+        
+        <MenuBar VerticalAlignment="Top"
+                 Height="35"
+                 Width="330"
+                 HorizontalAlignment="Left"
+                 BorderThickness="20"
+                 BorderBrush="White">
+            <MenuBarItem Name="PhotosMenuItem"
+                         Title="All Photos"
+                         Width="100"
+                         HorizontalContentAlignment="Center"
+                         FontFamily="Verdana"
+                         AutomationProperties.HelpText="All Photos" 
+                         VerticalAlignment="Stretch" 
+                         HorizontalAlignment="Stretch"
+                         Background="LightGray"
+                         Margin="0,0,10,0"
+                         DoubleTapped="PhotosMenuItem_DoubleTapped"
+                         >
+                <MenuFlyoutItem x:Name="PhotosNewFlyout" 
+                                Text="New"
+                                Click="PhotosNewFlyout_Click"/>
+            </MenuBarItem>
+
+            <MenuBarItem Name="AlbumsMenuItem"  
+                         Title="Albums"
+                         Width="100"
+                         FontFamily="Verdana" 
+                         AutomationProperties.HelpText="Go to Albums" 
+                         HorizontalContentAlignment="Center"
+                         VerticalAlignment="Stretch" 
+                         HorizontalAlignment="Stretch"
+                         Background="LightGray"
+                         Margin="0,0,10,0"
+                         Tapped="AlbumsMenuItem_Tapped">
+                <MenuFlyoutItem x:Name="AlbumsNewFlyout" 
+                                Text="New"
+                                Click="AlbumsNewFlyout_Click"/>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem x:Name="AlbumsEditFlyout"
+                                Text="Edit"
+                                Click="AlbumsEditFlyout_Click"/>
+            </MenuBarItem>
+
+        </MenuBar>
+        <Frame Grid.Row="1"
+               Name="MainFrame"/>
+    </Grid>
+</Page>
