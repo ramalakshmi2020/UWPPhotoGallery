@@ -26,6 +26,8 @@ namespace UWPPhotoGallery
     public sealed partial class PhotosDisplayPage : Page
     {
         public ObservableCollection<Photo> Photos;
+
+        private string context;
         public PhotosDisplayPage()
         {
             this.InitializeComponent();
@@ -37,30 +39,36 @@ namespace UWPPhotoGallery
         /// This method will actually query for all the pictures present in the my pictures folder and display it to the user
         /// We have subscribed for this because the loading of pics is async and cannot be done in the constructor of the page.
         /// If there are no pictures it will display a pop up box asking the user to add pics to the folder.
+        /// Added context tot he method - the page is used to display all photos or photos pertaining to an album with the albumname contexr
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void PhotosDisplayPage_Loaded(object sender, RoutedEventArgs e)
-        {
-           
-            LoadingRing.IsActive = true;
-            //now if there is no context - ( i.e all photos should be loaded)
-
-            await PhotoManager.GetAllPhotos(Photos);
-            LoadingRing.IsActive = false;
-
-
-
-        }
+        
         async protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             
             //now do whatever that needs to be done
             LoadingRing.IsActive = true;
+            context = e.Parameter as string;
             //now if there is no context - ( i.e all photos should be loaded)
-
-            bool loaded = await PhotoManager.GetAllPhotos(Photos);
+            //based on the context either load all photos or the photos of an album
+            bool loaded = false;
+            if (String.IsNullOrEmpty(context) || context == "Photos")
+            {
+                DisplayTypeTextBlock.Text = "Photos";
+                //No need for edit button here in this context
+                EditAlbumButton.Visibility = Visibility.Collapsed;
+                loaded = await PhotoManager.GetAllPhotos(Photos);
+            }
+            else
+            {
+                DisplayTypeTextBlock.Text = context;
+                EditAlbumButton.Visibility = Visibility.Visible;
+                loaded = PhotoManager.GetPhotosForAlbumName(Photos, context);
+                
+            }
+             
             //if retval is false and photos collection is empty - tell the user something is wrong
             if(loaded && Photos.Count == 0)
             {
@@ -83,13 +91,24 @@ namespace UWPPhotoGallery
 
         private void PhotoImage_Tapped(object sender, TappedRoutedEventArgs e)
         {
+
+            //disable edit button
+            EditAlbumButton.Visibility = Visibility.Collapsed;
+            DisplayTypeTextBlock.Visibility = Visibility.Collapsed;
             //on tapping this image, load the flipview control with the cureent image as the default one
             Photo selectedphoto = PhotoGrid.SelectedItem as Photo;
             PhotoFlipView.SelectedItem = selectedphoto;
             //enable flipview
+            
             PhotoFlipView.Visibility = Visibility.Visible;
-            //disable the listtypetextbox
-            DisplayTypeTextBlock.Visibility = Visibility.Collapsed;
+
+        }
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            //just load the addalbum page with mode as edit
+            string context = DisplayTypeTextBlock.Text;
+            this.Frame.Navigate(typeof(AddNewAlbumPage), context);
+
         }
     }
 }

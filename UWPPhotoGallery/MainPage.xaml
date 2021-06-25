@@ -14,33 +14,31 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Border Grid.Row="0">
-          <!--  <Border.Background>
+            <!--  <Border.Background>
                 <LinearGradientBrush>
                     <GradientStop Color="Gray"/>
                 </LinearGradientBrush>
             </Border.Background> !-->
         </Border>
-        
+
         <MenuBar VerticalAlignment="Top"
                  Height="35"
                  Width="330"
                  HorizontalAlignment="Left"
                  BorderThickness="20"
-                 BorderBrush="White">
+                 BorderBrush="White"
+                 CornerRadius="5">
             <MenuBarItem Name="PhotosMenuItem"
-                         Title="All Photos"
+                         Title="Photos"
                          Width="100"
-                         HorizontalContentAlignment="Center"
                          FontFamily="Verdana"
                          AutomationProperties.HelpText="All Photos" 
-                         VerticalAlignment="Stretch" 
-                         HorizontalAlignment="Stretch"
-                         Background="LightGray"
-                         Margin="0,0,10,0"
-                         DoubleTapped="PhotosMenuItem_DoubleTapped"
-                         >
+                         Margin="20,5,0,0">
+                <MenuFlyoutItem x:Name="PhotosViewFlyout" 
+                                Text="View"
+                                Click="PhotosViewFlyout_Click"/>
                 <MenuFlyoutItem x:Name="PhotosNewFlyout" 
-                                Text="New"
+                                Text="Add"
                                 Click="PhotosNewFlyout_Click"/>
             </MenuBarItem>
 
@@ -49,19 +47,13 @@
                          Width="100"
                          FontFamily="Verdana" 
                          AutomationProperties.HelpText="Go to Albums" 
-                         HorizontalContentAlignment="Center"
-                         VerticalAlignment="Stretch" 
-                         HorizontalAlignment="Stretch"
-                         Background="LightGray"
-                         Margin="0,0,10,0"
-                         Tapped="AlbumsMenuItem_Tapped">
+                         Margin="20,5,0,0">
+                <MenuFlyoutItem x:Name="AlbumsViewFlyout"
+                                Text="View"
+                                Click="AlbumsViewFlyout_Click"/>
                 <MenuFlyoutItem x:Name="AlbumsNewFlyout" 
-                                Text="New"
+                                Text="Add"
                                 Click="AlbumsNewFlyout_Click"/>
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem x:Name="AlbumsEditFlyout"
-                                Text="Edit"
-                                Click="AlbumsEditFlyout_Click"/>
             </MenuBarItem>
 
         </MenuBar>
