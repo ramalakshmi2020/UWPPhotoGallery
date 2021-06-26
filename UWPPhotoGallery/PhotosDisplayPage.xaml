@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:model="using:UWPPhotoGallery.Model"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -22,29 +21,32 @@
                        FontFamily="Verdana" 
                        TextDecorations="Underline"
                        Height=" 45"
-                       Width=" 200"
-                      
-                       HorizontalTextAlignment="Center"
-                       Margin="10,15,0,0">
-
+                       Width=" 800"                      
+                       HorizontalTextAlignment="Center">
             </TextBlock>
-
+            <Button Name ="EditAlbumButton" 
+                    RelativePanel.AlignLeftWithPanel="true"
+                    RelativePanel.AlignVerticalCenterWithPanel="True"
+                    Content ="Edit"
+                    
+                    Width=" 100"
+                    Visibility="Visible"
+                    Click="EditButton_Click"
+                    CornerRadius="5"
+                    Margin="20,5,0,0">
+            </Button>
         </RelativePanel>
         <ProgressRing Name="LoadingRing" Grid.Row="1"  ></ProgressRing>
         <GridView Name ="PhotoGrid"
-                      IsTapEnabled="True"
-                      Grid.Row="1"
-                      ItemsSource="{x:Bind Photos}"
-                      >
+                  IsTapEnabled="True"
+                  Grid.Row="1"
+                  ItemsSource="{x:Bind Photos}">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="model:Photo">
                     <Image x:Name ="PhotoImage"
                            Tapped="PhotoImage_Tapped"
-                           Width="200"  
-                           Height=" 200"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Stretch"
-                           Source="{x:Bind Thumbnail}" >
+                           Source="{x:Bind Thumbnail}"
+                           Width="200">
                     </Image>
                 </DataTemplate>
             </GridView.ItemTemplate>
@@ -52,9 +54,7 @@
         <FlipView  x:Name="PhotoFlipView" 
                    Grid.Column="1" 
                    ItemsSource="{x:Bind Photos}"
-                   Visibility="Collapsed"
-                   
-           >
+                   Visibility="Collapsed">
             <FlipView.ItemTemplate>
                 <DataTemplate x:DataType="model:Photo">
                     <Grid>
@@ -65,8 +65,5 @@
                 </DataTemplate>
             </FlipView.ItemTemplate>
         </FlipView>
-
-
-
     </Grid>
 </Page>

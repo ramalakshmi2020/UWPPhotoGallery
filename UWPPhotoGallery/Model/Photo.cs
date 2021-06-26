@@ -32,6 +32,11 @@ namespace UWPPhotoGallery.Model
         /// and can be mapped to any image control in xaml
         /// </summary>
         public ImageSource Thumbnail { get; set; }
+
+        /// <summary>
+        /// The date and time taken of the picture file
+        /// </summary>
+        public DateTime DateTaken { get; set; }
         
     }
 }

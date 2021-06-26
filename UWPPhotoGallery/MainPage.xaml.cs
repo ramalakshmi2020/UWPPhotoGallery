@@ -30,14 +30,15 @@ namespace UWPPhotoGallery
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+
+            string context = "Photos";
             //by default always display the photos collection
-            this.MainFrame.Navigate(typeof(PhotosDisplayPage));
+            this.MainFrame.Navigate(typeof(PhotosDisplayPage), context);
         }
 
         private void PhotosMenuItem_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            string context = "Photos";
-            this.MainFrame.Navigate(typeof(PhotosDisplayPage), context);
+            
 
         }
 
@@ -50,25 +51,24 @@ namespace UWPPhotoGallery
             this.MainFrame.Navigate(typeof(PhotosDisplayPage));
         }
 
-        private void AlbumsMenuItem_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-
-        }
-
+        
         private void AlbumsNewFlyout_Click(object sender, RoutedEventArgs e)
         {
-
+            //user wAants ot create a new album
+            //take him to create new albums page
+            this.MainFrame.Navigate(typeof(AddNewAlbumPage));
         }
 
-        private void AlbumsEditFlyout_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void PhotosMenuItem_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+       
+        private void PhotosViewFlyout_Click(object sender, RoutedEventArgs e)
         {
             string context = "Photos";
             this.MainFrame.Navigate(typeof(PhotosDisplayPage), context);
+        }
+
+        private void AlbumsViewFlyout_Click(object sender, RoutedEventArgs e)
+        {
+            this.MainFrame.Navigate(typeof(AlbumsPage));
 
         }
     }
