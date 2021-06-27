@@ -113,12 +113,19 @@ namespace UWPPhotoGallery
             
         }
 
-        private void DeleteOK(IUICommand command)
+        private async void DeleteOK(IUICommand command)
         {
             var selecteditems = AlbumGrid.SelectedItems.ToList();
             List<Album> TodeleteAlbums = new List<Album>();
             foreach (Album al in selecteditems) { TodeleteAlbums.Add(al); }
-            PhotoManager.DeleteAlbums(TodeleteAlbums);
+            bool retval = PhotoManager.DeleteAlbums(TodeleteAlbums);
+            if (!retval)
+            {
+                //display message to the user and move on to display the page
+                var messageDialog = new MessageDialog("OOPS! Something happened, Unable to delete Album(s). Please Try Again or Contact App Support");
+                messageDialog.Commands.Add(new UICommand("OK"));
+                await messageDialog.ShowAsync();
+            }
             this.Frame.Navigate(typeof(AlbumsPage));
 
         }

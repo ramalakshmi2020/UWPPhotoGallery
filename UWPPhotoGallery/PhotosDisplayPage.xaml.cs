@@ -27,6 +27,8 @@ namespace UWPPhotoGallery
     {
         public ObservableCollection<Photo> Photos;
 
+        private bool isSelectButtonClicked = false;
+
         private string context;
         public PhotosDisplayPage()
         {
@@ -59,12 +61,16 @@ namespace UWPPhotoGallery
                 DisplayTypeTextBlock.Text = "Photos";
                 //No need for edit button here in this context
                 EditAlbumButton.Visibility = Visibility.Collapsed;
+                //enable select button
+                SelectPhotosButton.Visibility = Visibility.Visible;
                 loaded = await PhotoManager.GetAllPhotos(Photos);
             }
             else
             {
                 DisplayTypeTextBlock.Text = context;
                 EditAlbumButton.Visibility = Visibility.Visible;
+                SelectPhotosButton.Visibility = Visibility.Collapsed;
+
                 loaded = PhotoManager.GetPhotosForAlbumName(Photos, context);
                 
             }
@@ -91,16 +97,18 @@ namespace UWPPhotoGallery
 
         private void PhotoImage_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            if (!isSelectButtonClicked)
+            {
+                //disable edit button
+                EditAlbumButton.Visibility = Visibility.Collapsed;
+                DisplayTypeTextBlock.Visibility = Visibility.Collapsed;
+                //on tapping this image, load the flipview control with the cureent image as the default one
+                Photo selectedphoto = PhotoGrid.SelectedItem as Photo;
+                PhotoFlipView.SelectedItem = selectedphoto;
+                //enable flipview
 
-            //disable edit button
-            EditAlbumButton.Visibility = Visibility.Collapsed;
-            DisplayTypeTextBlock.Visibility = Visibility.Collapsed;
-            //on tapping this image, load the flipview control with the cureent image as the default one
-            Photo selectedphoto = PhotoGrid.SelectedItem as Photo;
-            PhotoFlipView.SelectedItem = selectedphoto;
-            //enable flipview
-            
-            PhotoFlipView.Visibility = Visibility.Visible;
+                PhotoFlipView.Visibility = Visibility.Visible;
+            }
 
         }
         private void EditButton_Click(object sender, RoutedEventArgs e)
@@ -109,6 +117,56 @@ namespace UWPPhotoGallery
             string context = DisplayTypeTextBlock.Text;
             this.Frame.Navigate(typeof(AddNewAlbumPage), context);
 
+        }
+
+        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var messageDialog = new MessageDialog("About to delete Photo(s). Are you sure?");
+            //create list of command and handlers
+            messageDialog.Commands.Add(new UICommand("OK", new UICommandInvokedHandler(this.DeleteOK)));
+            messageDialog.Commands.Add(new UICommand("Cancel", new UICommandInvokedHandler(this.DeleteCancel)));
+            await messageDialog.ShowAsync();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            //load the same page again with 
+            this.Frame.Navigate(typeof(PhotosDisplayPage));
+        }
+
+        private void SelectPhotosButton_Click(object sender, RoutedEventArgs e)
+        {
+            //select is clicked - make the photogrid multiselectmode and enable delete and cancelbuttons
+            isSelectButtonClicked = true;
+            PhotoGrid.SelectionMode = ListViewSelectionMode.Multiple;
+            PhotoGrid.IsMultiSelectCheckBoxEnabled = true;
+            DeleteButton.Visibility = Visibility.Visible;
+            CancelButton.Visibility = Visibility.Visible;
+            SelectPhotosButton.Visibility = Visibility.Collapsed;
+
+
+        }
+
+        private async void DeleteOK(IUICommand command)
+        {
+            var selecteditems = PhotoGrid.SelectedItems.ToList();
+            List<Photo> TodeletePhotos = new List<Photo>();
+            foreach (Photo al in selecteditems) { TodeletePhotos.Add(al); }
+            bool retval = await PhotoManager.DeletePhotos(TodeletePhotos);
+            if (!retval)
+            {
+                //display message to the user and move on to display the page
+                var messageDialog = new MessageDialog("OOPS! Something happened, Unable to delete Photo(s). Please Try Again or Contact App Support");
+                messageDialog.Commands.Add(new UICommand("OK"));
+                await messageDialog.ShowAsync();
+            }
+            this.Frame.Navigate(typeof(PhotosDisplayPage));
+
+        }
+
+        private void DeleteCancel(IUICommand command)
+        {
+            this.Frame.Navigate(typeof(PhotosDisplayPage));
         }
     }
 }

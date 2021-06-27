@@ -26,15 +26,48 @@
             </TextBlock>
             <Button Name ="EditAlbumButton" 
                     RelativePanel.AlignLeftWithPanel="true"
-                    RelativePanel.AlignVerticalCenterWithPanel="True"
                     Content ="Edit"
                     
                     Width=" 100"
                     Visibility="Visible"
                     Click="EditButton_Click"
                     CornerRadius="5"
-                    Margin="20,5,0,0">
+                    Margin="20,10,0,10">
             </Button>
+            <Button Name ="SelectPhotosButton" 
+                    RelativePanel.AlignLeftWithPanel="true"
+                    
+                    Content ="Select"
+                    
+                    Width=" 100"
+                    Visibility="Visible"
+                    Click="SelectPhotosButton_Click"
+                    CornerRadius="5"
+                    Margin="20,10,0,10">
+            </Button>
+            <Button x:Name="DeleteButton" 
+                Width="100"
+                Content="Delete"
+                VerticalAlignment="Center"
+                RelativePanel.RightOf="SelectPhotosButton"
+                Click="DeleteButton_Click"
+                Visibility="Collapsed"
+                Foreground="Black"
+                Background="LightGray"
+                CornerRadius="5"
+                Margin="5,0,0,0"></Button>
+            <Button 
+                x:Name="CancelButton"
+                    Visibility="Collapsed"
+                    Width="100"
+                    Content="Cancel" 
+                    VerticalAlignment="Center"
+                    RelativePanel.RightOf ="DeleteButton"
+                    Click="CancelButton_Click"
+                    Foreground="Black"
+                    Background="LightGray"
+                    CornerRadius="5"
+                    Margin="5,0,0,0"></Button>
         </RelativePanel>
         <ProgressRing Name="LoadingRing" Grid.Row="1"  ></ProgressRing>
         <GridView Name ="PhotoGrid"

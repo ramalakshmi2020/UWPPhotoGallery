@@ -334,6 +334,13 @@ namespace UWPPhotoGallery
             return retval;
         }
 
+        /// <summary>
+        /// This method will add a new album it doesnot exist or modify the existing one
+        /// </summary>
+        /// <param name="oldAlbumName"></param>
+        /// <param name="newalbum"></param>
+        /// <param name="photostoadd"></param>
+        /// <returns></returns>
         public static async Task<bool> AddModifyAlbum(string oldAlbumName, Album newalbum, ObservableCollection<Photo> photostoadd)
         {
             bool retval = true;
@@ -373,22 +380,91 @@ namespace UWPPhotoGallery
             }
             return retval;
         }
-        public static async void DeletePhotos(ObservableCollection<Photo> photos)
+
+        /// <summary>
+        /// Deletion of photos 
+        /// </summary>
+        /// <param name="photos"></param>
+        public static async Task<bool> DeletePhotos(List<Photo> photos)
         {
-            foreach (Photo ph in photos)
+            bool retval = true;
+            try
             {
-                StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
+                foreach (Photo ph in photos)
+                {
+                    StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
 
-                StorageFile manifestFile = await picturesFolder.GetFileAsync(ph.FilePath);
-                await manifestFile.DeleteAsync();
+                    StorageFile manifestFile = await picturesFolder.GetFileAsync(Path.GetFileName(ph.FilePath));
+                    await manifestFile.DeleteAsync();
+                    
+                    //Need to remove the photo from static collection too.
+                    AllPhotos.Remove(ph);
 
+                    //also need to remove references from the albums if any
+                    foreach (Album al in AllAlbums)
 
+                    {
+                        ObservableCollection<Photo> albumphotos = new ObservableCollection<Photo>();
+                       
 
+                        string path = $"{Windows.Storage.ApplicationData.Current.LocalFolder.Path}\\Albums\\{al.Name}.txt";
+
+                        //open the file and check for occurances of this pic file
+                        StreamReader sr = new StreamReader(path);
+                        string currentcontents = sr.ReadToEnd();
+                        sr.Close();
+                        List<string> listofPhotos = currentcontents.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                        
+                        //check if this photo belongs to an album
+                        //if so the album file and the collection needs to be changed
+                        if (listofPhotos.Contains(ph.FilePath))
+                        {
+                            listofPhotos.RemoveAll(x => x == ph.FilePath);
+
+                            //newstring to write to the file now
+                            
+                            //does the coverphoto match?
+                            if (al.CoverPhotoFilePath == ph.FilePath)
+                            {
+                                //change the coverphoto to any other photo
+                                al.CoverPhotoFilePath = listofPhotos[0];
+                                //add the first line to be the coverphoto
+                                listofPhotos.Insert(0, al.CoverPhotoFilePath);
+                                //we need to also change the thumbnail
+                                StorageFile picfile = await picturesFolder.GetFileAsync(Path.GetFileName(al.CoverPhotoFilePath));
+
+                                var thumbnail = await picfile.GetThumbnailAsync(ThumbnailMode.SingleItem);
+                                BitmapImage thumbnailimage = new BitmapImage();
+                                await thumbnailimage.SetSourceAsync(thumbnail);
+                                al.CoverPhotoThumbnail = thumbnailimage;
+
+                            }
+                            StreamWriter sw = new StreamWriter(path);
+                            foreach (string s in listofPhotos)
+                            {
+                                sw.WriteLine(s);
+                            }
+                            sw.Close();
+                        }
+
+                        // if that is
+                    }
+                }
+                
             }
-            var setToRemove = new HashSet<Photo>(photos);
-            AllPhotos.RemoveAll(x => setToRemove.Contains(x));
+            catch
+            {
+                retval = false;
+            }
+            return retval;
         }
 
+        /// <summary>
+        /// Deletion of albums
+        /// </summary>
+        /// <param name="albums"></param>
+        /// <returns></returns>
         public static bool DeleteAlbums(List<Album> albums)
         {
             bool retval = true;
