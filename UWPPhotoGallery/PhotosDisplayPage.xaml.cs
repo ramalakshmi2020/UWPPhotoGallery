@@ -101,6 +101,8 @@ namespace UWPPhotoGallery
             {
                 //disable edit button
                 EditAlbumButton.Visibility = Visibility.Collapsed;
+                //disable select button too
+                SelectPhotosButton.Visibility = Visibility.Collapsed;
                 DisplayTypeTextBlock.Visibility = Visibility.Collapsed;
                 //on tapping this image, load the flipview control with the cureent image as the default one
                 Photo selectedphoto = PhotoGrid.SelectedItem as Photo;

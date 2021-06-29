@@ -192,6 +192,7 @@ namespace UWPPhotoGallery
                 retval = false;
 
             }
+
             return retval;
             
 
@@ -396,9 +397,12 @@ namespace UWPPhotoGallery
 
                     StorageFile manifestFile = await picturesFolder.GetFileAsync(Path.GetFileName(ph.FilePath));
                     await manifestFile.DeleteAsync();
-                    
+
                     //Need to remove the photo from static collection too.
                     AllPhotos.Remove(ph);
+
+                    //create a list of albums that should be deleted incase the photos in them are all gone
+                    List<Album> toDelete = new List<Album>();
 
                     //also need to remove references from the albums if any
                     foreach (Album al in AllAlbums)
@@ -414,7 +418,7 @@ namespace UWPPhotoGallery
                         string currentcontents = sr.ReadToEnd();
                         sr.Close();
                         List<string> listofPhotos = currentcontents.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-
+                       
                         
                         //check if this photo belongs to an album
                         //if so the album file and the collection needs to be changed
@@ -423,32 +427,48 @@ namespace UWPPhotoGallery
                             listofPhotos.RemoveAll(x => x == ph.FilePath);
 
                             //newstring to write to the file now
+                            //proceed only if there are anymore entries
+                            if (listofPhotos.Count > 0)
+                            {
+
+                                //does the coverphoto match?
+                                if (al.CoverPhotoFilePath == ph.FilePath)
+                                {
+                                    //change the coverphoto to any other photo
+                                    al.CoverPhotoFilePath = listofPhotos[0];
+                                    //add the first line to be the coverphoto
+                                    listofPhotos.Insert(0, al.CoverPhotoFilePath);
+                                    //we need to also change the thumbnail
+                                    StorageFile picfile = await picturesFolder.GetFileAsync(Path.GetFileName(al.CoverPhotoFilePath));
+
+                                    var thumbnail = await picfile.GetThumbnailAsync(ThumbnailMode.SingleItem);
+                                    BitmapImage thumbnailimage = new BitmapImage();
+                                    await thumbnailimage.SetSourceAsync(thumbnail);
+                                    al.CoverPhotoThumbnail = thumbnailimage;
+
+                                }
+                                //if there isnothing to write - for example the user has deleted all photos belonging to an album - the album should also get deleted
                             
-                            //does the coverphoto match?
-                            if (al.CoverPhotoFilePath == ph.FilePath)
-                            {
-                                //change the coverphoto to any other photo
-                                al.CoverPhotoFilePath = listofPhotos[0];
-                                //add the first line to be the coverphoto
-                                listofPhotos.Insert(0, al.CoverPhotoFilePath);
-                                //we need to also change the thumbnail
-                                StorageFile picfile = await picturesFolder.GetFileAsync(Path.GetFileName(al.CoverPhotoFilePath));
-
-                                var thumbnail = await picfile.GetThumbnailAsync(ThumbnailMode.SingleItem);
-                                BitmapImage thumbnailimage = new BitmapImage();
-                                await thumbnailimage.SetSourceAsync(thumbnail);
-                                al.CoverPhotoThumbnail = thumbnailimage;
-
+                                StreamWriter sw = new StreamWriter(path);
+                                foreach (string s in listofPhotos)
+                                {
+                                    sw.WriteLine(s);
+                                }
+                                sw.Close();
                             }
-                            StreamWriter sw = new StreamWriter(path);
-                            foreach (string s in listofPhotos)
+                            else
                             {
-                                sw.WriteLine(s);
+                                //delete the whole file - does not make sense to hold on to an empty file
+                                toDelete.Add(al);
+                                //we cannt delete the album yet since we are parsing through the same collection
                             }
-                            sw.Close();
                         }
 
                         // if that is
+                    }
+                    if(toDelete.Count > 0)
+                    {
+                        DeleteAlbums(toDelete);
                     }
                 }
                 
