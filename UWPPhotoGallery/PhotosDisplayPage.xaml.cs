@@ -59,11 +59,17 @@ namespace UWPPhotoGallery
             if (String.IsNullOrEmpty(context) || context == "Photos")
             {
                 DisplayTypeTextBlock.Text = "Photos";
+               
                 //No need for edit button here in this context
                 EditAlbumButton.Visibility = Visibility.Collapsed;
                 //enable select button
-                SelectPhotosButton.Visibility = Visibility.Visible;
                 loaded = await PhotoManager.GetAllPhotos(Photos);
+                if (Photos.Count > 0)
+                {
+                    //enable select button only if there are photos displayed
+                    SelectPhotosButton.Visibility = Visibility.Visible;
+                }
+               
             }
             else
             {

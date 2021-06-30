@@ -40,7 +40,7 @@
                     Content ="Select"
                     
                     Width=" 100"
-                    Visibility="Visible"
+                    Visibility="Collapsed"
                     Click="SelectPhotosButton_Click"
                     CornerRadius="5"
                     Margin="20,10,0,10">
